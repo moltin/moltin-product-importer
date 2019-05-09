@@ -1,0 +1,28 @@
+service: importer
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'dev'}
+  environment: ${file(.env.yml):${self:provider.stage}}
+
+package:
+  include:
+    - ./moltin.js
+    - ./map.js
+
+functions:
+  processGet:
+    handler: handler.processGet
+  processUpdate:
+    handler: handler.processUpdate
+  processInsert:
+    handler: handler.processInsert
+
+
+  analyze:
+    handler: handler.analyze
