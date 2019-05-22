@@ -5,7 +5,6 @@
 - Run `redis-server` or grab URL or remote `redis` instance.
 - If using URL, configure `Kue` to use this redis instance
 - Grab the CSV data and drop it into this folder.
-- Configure the `imagesLocation` constant to point to a new images folder if necessary
 - Configure the `csvLocation` constant to point to a new CSV file if necessary
 - First, run the `sls invoke local -f processGet` function only.
 - Then, run the `sls invoke local -f processUpdate` function only.
