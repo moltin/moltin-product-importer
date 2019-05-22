@@ -13,7 +13,7 @@ provider:
 package:
   include:
     - ./moltin.js
-    - ./map.js
+    - ./map.ts
 
 functions:
   processGet:
@@ -22,7 +22,3 @@ functions:
     handler: handler.processUpdate
   processInsert:
     handler: handler.processInsert
-
-
-  analyze:
-    handler: handler.analyze

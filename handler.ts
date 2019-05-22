@@ -1,5 +1,5 @@
 const csv = require("fast-csv")
-const map = require('./map')
+const map = require('./map.ts')
 const MoltinGateway = require("./moltin.js").gateway
 
 const Moltin = MoltinGateway({
@@ -22,7 +22,7 @@ export const processGet = async (event, context, callback) => {
   const products: any[] = await getProductsFromCSV(csvLocation);
   console.log(`${products.length} products parsed`);
 
-  addProductsToGetQueue(products);
+  await addProductsToGetQueue(products);
   processGetJobs();
 };
 
@@ -37,24 +37,6 @@ export const analyze = async (event, context, callback) => {
   console.log("Parsing products CSV");
   const products: any[] = await getProductsFromCSV(csvLocation);
   console.log(`${products.length} products parsed`);
-};
-
-const analyzeProducts = (products, images) => {
-  let productsWithAdditionalData = products.filter(product => {
-    return images[product["sku"]] != null;
-  });
-  console.log(`Count of additional data: ${Object.keys(images).length}`);
-  console.log(
-    `Number of products with additional data: ${
-      productsWithAdditionalData.length
-    }`
-  );
-  console.log(
-    `Number of products without additional data: ${products.length -
-      productsWithAdditionalData.length}`
-  );
-
-  return productsWithAdditionalData;
 };
 
 const shutdownQueue = () => {
@@ -81,6 +63,7 @@ const processGetJobs = () => {
       const {
         data: { product }
       } = job;
+
       //see if the product exisit based on sku
       console.log(`Get product ${product.sku}`);
       //either update or insert
@@ -172,6 +155,8 @@ const insertProduct = async product => {
 };
 
 const addProductToGetQueue = async product => {
+  console.log(product)
+
   jobQueue
     .create("get-product", {
       title: `Getting product ${product.sku}`,
@@ -289,18 +274,19 @@ const getProductsFromCSV = async (fileLocation): Promise<any[]> => {
     headers: true,
     objectMode: true,
     ignoreEmpty: true,
-    strictColumnHandling: true
   });
 
   const productsStream = fs.createReadStream(fileLocation);
   const csvStream = reader
-    //TODO Stream
     .transform(item => {
-      return map.mapper(item);
-      //TODO stream wtire
+      return map.productDataMapper(item);
     })
     .on("data", data => objects.push(data))
+    .on("error", function(data){
+      return false;                         
+    })
     .on("end", () => {
+      console.log(objects)
       resolveCallback(objects);
     });
   productsStream.pipe(csvStream);
