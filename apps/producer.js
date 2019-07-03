@@ -1,10 +1,12 @@
 require('dotenv').config()
 const Queue = require('bull')
 const express = require('express')
+
 const app = express()
 const port = 4000
 
 const { getProductsFromCSV, addProductsToGetQueue } = require('./utils/producerUtils')
+
 const CSVLocation = process.env.PRODUCTS_CSV
 
 const createQueue = (name) => {
@@ -18,19 +20,19 @@ jobQueue.on('global:waiting', (jobId) => {
   console.log(`${jobId} is waiting to be processed`)
 })
 
-jobQueue.on('global:progress', function(jobId, progress) {
-    console.log(`Job ${jobId} is ${progress * 100}% ready!`);
-});
+jobQueue.on('global:progress', (jobId, progress) => {
+  console.log(`Job ${jobId} is ${progress * 100}% ready!`)
+})
 
-jobQueue.on('global:failed', function(jobId, err) {
-    console.log(`Job ${jobId} failed with reason ${err}`);
-});
-  
-jobQueue.on('global:completed', function(jobId, result) {
-    console.log(`Job ${jobId} completed! Result: ${result}`);
-    jobQueue.getJob(jobId).then(function(job) {
-      job.remove();
-    });
+jobQueue.on('global:failed', (jobId, err) => {
+  console.log(`Job ${jobId} failed with reason ${err}`)
+})
+
+jobQueue.on('global:completed', (jobId, result) => {
+  console.log(`Job ${jobId} completed! Result: ${result}`)
+  jobQueue.getJob(jobId).then((job) => {
+    job.remove()
+  })
 })
 
 app.get('/produceGetJobs', async (req, res) => {

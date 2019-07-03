@@ -1,11 +1,19 @@
-var exports = module.exports = {}
+const exports = module.exports = {}
 
 const csv = require('fast-csv')
 const fs = require('fs')
 
+const toMoltinObject = data => ({
+  // left is moltin || right is CSV
+  sku: data.sku,
+  name: data.name,
+  description: data.description,
+})
+
+
 exports.getProductsFromCSV = async (fileLocation) => {
   let resolveCallback
-  const promise = new Promise((resolve, reject) => {
+  const promise = new Promise((resolve) => {
     resolveCallback = resolve
   })
 
@@ -29,27 +37,16 @@ exports.getProductsFromCSV = async (fileLocation) => {
   return promise
 }
 
-const toMoltinObject = data => ({
-  // left is moltin || right is CSV
-  sku: data.sku,
-  name: data.name,
-  description: data.description,
-})
-
 const addProductToGetQueue = async (jobQueue, product) => {
-  console.log('running addProductToGetQueue')
-
   jobQueue
     .add('get-product', {
       title: `Getting product ${product.sku}`,
       product,
     })
-
-  console.log('done addProductToGetQueue')
 }
 
 exports.addProductsToGetQueue = async (jobQueue, products) => {
-  for (let i = 0, len = products.length; i < len; i++) {
+  for (let i = 0, len = products.length; i < len; i += 1) {
     const product = products[i]
     await addProductToGetQueue(jobQueue, product)
   }

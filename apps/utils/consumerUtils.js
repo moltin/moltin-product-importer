@@ -1,4 +1,4 @@
-var exports = module.exports = {}
+const exports = module.exports = {}
 require('dotenv').config()
 const MoltinGateway = require('@moltin/sdk').gateway
 
@@ -7,15 +7,15 @@ const Moltin = new MoltinGateway({
   client_secret: process.env.MOLTIN_CLIENT_SECRET,
 })
 
-exports.updateProduct = async product => {
-  console.log(`Updating ID: ${product.id}`);
-  return Moltin.Products.Update(product.id, product);
-};
+exports.updateProduct = async (product) => {
+  console.log(`Updating ID: ${product.id}`)
+  return Moltin.Products.Update(product.id, product)
+}
 
-exports.insertProduct = async product => {
-  console.log(`Inserting product: ${product.sku}`);
-  return Moltin.Products.Create(product);
-};
+exports.insertProduct = async (product) => {
+  console.log(`Inserting product: ${product.sku}`)
+  return Moltin.Products.Create(product)
+}
 
 exports.getProduct = async product => Moltin.Products.Filter({ eq: { sku: product } })
   .All()
@@ -43,13 +43,13 @@ exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
   exports.addProductToUpdateQueue(queue, job.data.product)
 
   const {
-    errors: [{ status }]
-  } = errorMessage;
+    errors: [{ status }],
+  } = errorMessage
 
-  if (status == 429) {
-    console.log("Rate limit hit");
+  if (status === 429) {
+    console.log('Rate limit hit')
     queue.pause.then(() => {
-      setTimeout(function () {
+      setTimeout(() => {
         queue.resume()
       }, 2000)
     })
@@ -60,24 +60,21 @@ exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
 }
 
 exports.handleFailedInsertJob = (queue, job, errorMessage) => {
-
   job.moveToFailed('failed', true)
   exports.addProductToInsertQueue(queue, job.data.product)
 
   const {
-    errors: [{ status }]
-  } = errorMessage;
+    errors: [{ status }],
+  } = errorMessage
 
-  if (status == 429) {
-    console.log("Rate limit hit");
+  if (status === 429) {
+    console.log('Rate limit hit')
     queue.pause.then(() => {
-      setTimeout(function () {
+      setTimeout(() => {
         queue.resume()
       }, 2000)
     })
-
   } else {
-    console.log(status)
     job.moveToFailed(status, true)
   }
 }
