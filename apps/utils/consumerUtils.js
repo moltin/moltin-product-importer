@@ -8,13 +8,13 @@ const Moltin = new MoltinGateway({
 })
 
 exports.updateProduct = async (product) => {
-  console.log(`Updating ID: ${product.id}`)
-  return Moltin.Products.Update(product.id, product)
+  // console.log(`Updating ID: ${product.id}`)
+  return await Moltin.Products.Update(product.id, product)
 }
 
 exports.insertProduct = async (product) => {
-  console.log(`Inserting product: ${product.sku}`)
-  return Moltin.Products.Create(product)
+  // console.log(`Inserting product: ${product.sku}`)
+  return await Moltin.Products.Create(product)
 }
 
 exports.getProduct = async product => Moltin.Products.Filter({ eq: { sku: product } })
@@ -40,41 +40,51 @@ exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
 
 exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
   job.moveToFailed('failed', true)
-  exports.addProductToUpdateQueue(queue, job.data.product)
 
-  const {
-    errors: [{ status }],
-  } = errorMessage
+  const { errors } = errorMessage
 
-  if (status === 429) {
-    console.log('Rate limit hit')
-    queue.pause.then(() => {
-      setTimeout(() => {
-        queue.resume()
-      }, 2000)
-    })
+  if(errors.length === 1) {
+    const { status } = errors[0]
+
+    if (status === 429) {
+      console.log('Rate limit hit')
+      queue.pause.then(() => {
+        setTimeout(() => {
+          queue.resume()
+        }, 2000)
+      })
+      exports.addProductToUpdateQueue(queue, job.data.product)
+      return(status)
+    } else {
+      job.moveToFailed(status, true)
+      return(status)
+    }
   } else {
-    console.log(status)
-    job.moveToFailed(status, true)
+    return(errors)
   }
 }
 
 exports.handleFailedInsertJob = (queue, job, errorMessage) => {
+  
   job.moveToFailed('failed', true)
-  exports.addProductToInsertQueue(queue, job.data.product)
+  
+  const { errors } = errorMessage
 
-  const {
-    errors: [{ status }],
-  } = errorMessage
-
-  if (status === 429) {
-    console.log('Rate limit hit')
-    queue.pause.then(() => {
-      setTimeout(() => {
-        queue.resume()
-      }, 2000)
-    })
+  if(errors.length === 1) {
+    if (status === 429) {
+      console.log('Rate limit hit')
+      queue.pause.then(() => {
+        setTimeout(() => {
+          queue.resume()
+        }, 2000)
+      })
+      exports.addProductToInsertQueue(queue, job.data.product)
+      return(status)
+    } else {
+      job.moveToFailed(status, true)
+      return(status)
+    }
   } else {
-    job.moveToFailed(status, true)
+    return(errors)
   }
 }

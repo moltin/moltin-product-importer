@@ -23,6 +23,27 @@ const jobQueue = new Queue('get-product-events', `redis://${process.env.REDIS_HO
 const updateJobQueue = new Queue('update-product-events', `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
 const insertJobQueue = new Queue('insert-product-events', `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
 
+jobQueue.on('global:completed', (jobId, result) => {
+  console.log(`Job ${jobId} completed! Result: ${result}`)
+  jobQueue.getJob(jobId).then((job) => {
+    job.remove()
+  })
+})
+
+updateJobQueue.on('global:completed', (jobId, result) => {
+  console.log(`Job ${jobId} completed! Result: ${result}`)
+  updateJobQueue.getJob(jobId).then((job) => {
+    job.remove()
+  })
+})
+
+insertJobQueue.on('global:completed', (jobId, result) => {
+  console.log(`Job ${jobId} completed! Result: ${result}`)
+  insertJobQueue.getJob(jobId).then((job) => {
+    job.remove()
+  })
+})
+
 jobQueue.process('get-product', async (job, done) => {
   try {
     const {
@@ -50,8 +71,8 @@ updateJobQueue.process('update-product', async (job, done) => {
     await updateProduct(job.data.updatedProduct)
     done(null, `${job.data.updatedProduct.id} was updated`)
   } catch (errorMessage) {
-    await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
-    done(JSON.stringify(errorMessage))
+    const result = await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
+    done(JSON.stringify(result))
   }
 })
 
@@ -60,8 +81,8 @@ insertJobQueue.process('insert-product', async (job, done) => {
     await insertProduct(job.data.product)
     done(null, `${job.data.product.id} was inserted`)
   } catch (errorMessage) {
-    await handleFailedInsertJob(insertJobQueue, job, errorMessage)
-    done(JSON.stringify(errorMessage))
+    const result = await handleFailedInsertJob(insertJobQueue, job, errorMessage)
+    done(JSON.stringify(result))
   }
 })
 

@@ -16,25 +16,6 @@ const createQueue = (name) => {
 
 const jobQueue = createQueue('get-product-events')
 
-jobQueue.on('global:waiting', (jobId) => {
-  console.log(`${jobId} is waiting to be processed`)
-})
-
-jobQueue.on('global:progress', (jobId, progress) => {
-  console.log(`Job ${jobId} is ${progress * 100}% ready!`)
-})
-
-jobQueue.on('global:failed', (jobId, err) => {
-  console.log(`Job ${jobId} failed with reason ${err}`)
-})
-
-jobQueue.on('global:completed', (jobId, result) => {
-  console.log(`Job ${jobId} completed! Result: ${result}`)
-  jobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
-
 app.get('/produceGetJobs', async (req, res) => {
   console.log('Parsing products CSV')
   const products = await getProductsFromCSV(CSVLocation)
