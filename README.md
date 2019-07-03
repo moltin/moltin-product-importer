@@ -11,10 +11,7 @@ mv .example.env .env
 yarn
 ```
 
-3. Redis
-Make sure Redis is running on the default host and port with no password
-
-4. Run
+2. Run
 ```
 npm start
 ```
