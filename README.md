@@ -13,7 +13,7 @@ yarn
 
 2. Run
 ```
-npm start
+yarn start
 ```
 
 ## Usage
