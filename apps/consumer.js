@@ -44,60 +44,51 @@ insertJobQueue.on('global:completed', (jobId, result) => {
   })
 })
 
-const getJobProcessor = (job) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const {
-        data: { product },
-      } = job
-  
-      const products = await getProduct(product.sku)
-  
-      if (products.length > 0) {
-        const existingProduct = products[0]
-        product.id = existingProduct.id
-        await addProductToUpdateQueue(updateJobQueue, product)
-        resolve(`${product.id} was added to update queue`)
-      } else {
-        await addProductToInsertQueue(insertJobQueue, product)
-        resolve(`${product.sku} was added to insert queue`)
-      }
-    } catch (e) {
-      reject(JSON.stringify(e))
-    }
-  })
-}
+const getJobProcessor = job => new Promise(async (resolve, reject) => {
+  try {
+    const {
+      data: { product },
+    } = job
 
-const updateJobProcessor = (job) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await updateProduct(job.data.updatedProduct)
-      resolve(`${job.data.updatedProduct.id} was updated`)
-    } catch (errorMessage) {
-      const result = await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
-      reject(JSON.stringify(result))
-    }
-  })
-}
+    const products = await getProduct(product.sku)
 
-const insertProductProcessor = (job) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await insertProduct(job.data.product)
-      resolve(`${job.data.product.sku} was inserted`)
-    } catch (errorMessage) {
-      const result = await handleFailedInsertJob(insertJobQueue, job, errorMessage)
-      reject(JSON.stringify(result))
+    if (products.length > 0) {
+      const existingProduct = products[0]
+      product.id = existingProduct.id
+      await addProductToUpdateQueue(updateJobQueue, product)
+      resolve(`${product.id} was added to update queue`)
+    } else {
+      await addProductToInsertQueue(insertJobQueue, product)
+      resolve(`${product.sku} was added to insert queue`)
     }
-  })
-}
+  } catch (e) {
+    reject(JSON.stringify(e))
+  }
+})
+
+const updateJobProcessor = job => new Promise(async (resolve, reject) => {
+  try {
+    await updateProduct(job.data.updatedProduct)
+    resolve(`${job.data.updatedProduct.id} was updated`)
+  } catch (errorMessage) {
+    const result = await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
+    reject(JSON.stringify(result))
+  }
+})
+
+const insertProductProcessor = job => new Promise(async (resolve, reject) => {
+  try {
+    await insertProduct(job.data.product)
+    resolve(`${job.data.product.sku} was inserted`)
+  } catch (errorMessage) {
+    const result = await handleFailedInsertJob(insertJobQueue, job, errorMessage)
+    reject(JSON.stringify(result))
+  }
+})
 
 jobQueue.process('get-product', getJobProcessor)
-
 updateJobQueue.process('update-product', updateJobProcessor)
-
 insertJobQueue.process('insert-product', insertProductProcessor)
 
 app.use('/arena', arena)
-
 app.listen(port, () => console.log(`Consumer app running on port ${port}`))

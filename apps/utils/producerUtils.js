@@ -1,5 +1,4 @@
 var exports = module.exports = {}
-
 const csv = require('fast-csv')
 const fs = require('fs')
 

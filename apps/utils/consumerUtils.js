@@ -7,17 +7,8 @@ const Moltin = new MoltinGateway({
   client_secret: process.env.MOLTIN_CLIENT_SECRET,
 })
 
-
-exports.updateProduct = async (product) => {
-  // console.log(`Updating ID: ${product.id}`)
-  return await Moltin.Products.Update(product.id, product)
-}
-
-exports.insertProduct = async (product) => {
-  // console.log(`Inserting product: ${product.sku}`)
-  return await Moltin.Products.Create(product)
-}
-
+exports.updateProduct = async product => await Moltin.Products.Update(product.id, product)
+exports.insertProduct = async product => await Moltin.Products.Create(product)
 exports.getProduct = async product => Moltin.Products.Filter({ eq: { sku: product } })
   .All()
   .then(data => data.data)
@@ -44,7 +35,7 @@ exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
 
   const { errors } = errorMessage
 
-  if(errors.length === 1) {
+  if (errors.length === 1) {
     const { status } = errors[0]
 
     if (status === 429) {
@@ -55,23 +46,22 @@ exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
         }, 2000)
       })
       exports.addProductToUpdateQueue(queue, job.data.product)
-      return(status)
-    } else {
-      job.moveToFailed(status, true)
-      return(status)
+      return (status)
     }
-  } else {
-    return(errors)
+    job.moveToFailed(status, true)
+    return (status)
   }
+  return (errors)
 }
 
 exports.handleFailedInsertJob = (queue, job, errorMessage) => {
-  
   job.moveToFailed('failed', true)
-  
+
   const { errors } = errorMessage
 
-  if(errors.length === 1) {
+  if (errors.length === 1) {
+    const { status } = errors[0]
+
     if (status === 429) {
       console.log('Rate limit hit')
       queue.pause.then(() => {
@@ -80,12 +70,10 @@ exports.handleFailedInsertJob = (queue, job, errorMessage) => {
         }, 2000)
       })
       exports.addProductToInsertQueue(queue, job.data.product)
-      return(status)
-    } else {
-      job.moveToFailed(status, true)
-      return(status)
+      return (status)
     }
-  } else {
-    return(errors)
+    job.moveToFailed(status, true)
+    return (status)
   }
+  return (errors)
 }
