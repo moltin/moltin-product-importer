@@ -5,7 +5,7 @@
 2. Npm (6.0.0 or newer)
 3. Redis
 
-## Setup
+## 🛠 Setup
 1. Rename `.example.env` to `.env` and add values
 ```
 mv .example.env .env
@@ -21,14 +21,14 @@ yarn
 yarn start
 ```
 
-## Usage
+## ⛽️ Usage
 Once the app has started, you can navigate to http://localhost:4567 in your web browser where you will see a neat web UI for observing the import. This UI runs using https://github.com/bee-queue/arena.
 
 To begin the import, simply GET localhost:4000
 
 **If you are re-running an import, you should run `redis-cli FLUSHALL` to make sure any old jobs are flushed from Redis.**
 
-## Internals
+## ⚡️ Internals
 Two express apps are automatically started for you:
 
 1. Producer (port 4000).
