@@ -1,0 +1,26 @@
+{
+  "name": "new-importer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "@moltin/sdk": "3.22.0",
+    "bull": "3.10.0",
+    "bull-arena": "2.6.3",
+    "bull-ui": "1.2.3",
+    "dotenv": "8.0.0",
+    "express": "4.17.1",
+    "fast-csv": "3.0.1",
+    "fs": "0.0.1-security"
+  },
+  "devDependencies": {
+    "@moltin/eslint-config": "1.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
