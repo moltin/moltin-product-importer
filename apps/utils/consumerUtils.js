@@ -7,6 +7,7 @@ const Moltin = new MoltinGateway({
   client_secret: process.env.MOLTIN_CLIENT_SECRET,
 })
 
+
 exports.updateProduct = async (product) => {
   // console.log(`Updating ID: ${product.id}`)
   return await Moltin.Products.Update(product.id, product)
