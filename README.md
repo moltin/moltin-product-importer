@@ -1,5 +1,10 @@
 ## Import Moltin Products
 
+## Pre-requisites
+1. NodeJS (10.0.0 or newer)
+2. Npm (6.0.0 or newer)
+3. Redis
+
 ## Setup
 1. Rename `.example.env` to `.env` and add values
 ```
