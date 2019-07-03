@@ -1,4 +1,4 @@
-const exports = module.exports = {}
+var exports = module.exports = {}
 require('dotenv').config()
 const MoltinGateway = require('@moltin/sdk').gateway
 
