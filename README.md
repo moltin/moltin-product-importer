@@ -11,23 +11,23 @@
 mv .example.env .env
 ```
 
-2. Install dependancies
+3. Install dependancies
 ```
 yarn
 ```
 
-3. Link package
+2. Link package
 ```
 yarn link
 ```
 
-4. Run
+3. Run
 ```
 import
 ```
 
 ## ⛽️ Usage
-Once the app has started, you can navigate to http://localhost:4567 in your web browser where you will see a neat web UI for observing the import. This UI runs using https://github.com/bee-queue/arena.
+Once the import app has started, you can navigate to http://localhost:4567 in your web browser where you will see a neat web UI for observing the import. This UI runs using https://github.com/bee-queue/arena.
 
 To begin the import, simply GET localhost:4000
 
