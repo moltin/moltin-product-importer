@@ -16,9 +16,14 @@ mv .example.env .env
 yarn
 ```
 
-2. Run
+3. Link package
 ```
-yarn start
+yarn link
+```
+
+4. Run
+```
+import
 ```
 
 ## ⛽️ Usage
