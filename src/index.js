@@ -1,2 +1,2 @@
-require = require('esm')(module);
-require('../src/cli').cli(process.argv);
+require = require('esm')(module)
+require('../src/cli').cli(process.argv)
