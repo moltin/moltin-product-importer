@@ -7,7 +7,7 @@ const port = 4000
 
 const { getProductsFromCSV, addProductsToGetQueue } = require('./utils/producerUtils')
 
-const CSVLocation = process.env.PRODUCTS_CSV
+const CSVLocation = './products.csv'
 
 const createQueue = (name) => {
   const jobQueue = new Queue(name, `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
