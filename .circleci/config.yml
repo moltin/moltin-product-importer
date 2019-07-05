@@ -9,11 +9,17 @@ jobs:
    deploy:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
-      - run:
-          name: Publish package
-          command: npm publish
+      - checkout
+      - restore_cache:
+          keys:
+            - moltin-import-{{ checksum "package.json" }}
+      - run: yarn
+      - run: npx semantic-release
+workflows:
+  version: 2
+  full_release:
+    jobs:
+      - release:
+          filters:
+            branches:
+              only: master
