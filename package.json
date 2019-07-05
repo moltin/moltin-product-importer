@@ -21,6 +21,7 @@
   "author": "Matthew Foyle",
   "license": "MIT",
   "dependencies": {
+    "@moltin/request": "^2.0.2",
     "@moltin/sdk": "3.22.0",
     "arg": "4.1.0",
     "bull": "3.10.0",
