@@ -1,11 +1,19 @@
 version: 2
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:latest
+
 jobs:
-  release:
-    docker:
-      - image: 'circleci/node:latest'
+   deploy:
+    <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - moltin-import-{{ checksum "package.json" }}
-      - run: npx semantic-release
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+      - run:
+          name: Publish package
+          command: npm publish
