@@ -12,7 +12,7 @@ npm init @moltin/import
 npx @moltin/import
 # or
 npm install -g @moltin/import
-import
+moltin-import
 ```
 
 ## ⛽️ Usage
