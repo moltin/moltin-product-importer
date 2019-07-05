@@ -1,4 +1,3 @@
-require('dotenv').config()
 const Queue = require('bull')
 const express = require('express')
 
@@ -21,7 +20,7 @@ const {
 const CSVLocation = global.csvPath
 
 const createQueue = (name) => {
-  const jobQueue = new Queue(name, `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
+  const jobQueue = new Queue(name, 'redis://127.0.0.1:6379')
   return jobQueue
 }
 
