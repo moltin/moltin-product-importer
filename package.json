@@ -1,6 +1,6 @@
 {
   "name": "@moltin/importer",
-  "version": "1.0.0",
+  "version": "0.0.0-semantic-release",
   "description": "A CLI to import data into Moltin via CSV",
   "main": "src/index.js",
   "engines": {
