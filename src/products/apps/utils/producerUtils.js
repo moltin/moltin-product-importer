@@ -17,7 +17,7 @@ const parseFlowData = async (json) => {
 }
 
 const parseCoreData = async (json) => {
-  const required = ['name', 'sku', 'description', 'manage_stock', 'slug', 'status', 'commodity_type', 'price', 'weight']
+  const required = ['name', 'sku', 'description', 'slug', , 'price']
 
   const missingCoreData = required
     .filter(key => !Object.keys(json).includes(key))
