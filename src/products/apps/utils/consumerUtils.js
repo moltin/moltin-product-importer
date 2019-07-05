@@ -16,7 +16,6 @@ exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
     })
 }
 
-
 exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
   const { errors } = errorMessage
 
@@ -43,7 +42,7 @@ exports.handleFailedInsertJob = (queue, job, errorMessage) => {
   job.moveToFailed('failed', true)
 
   const { errors } = errorMessage
-
+  
   if (errors.length === 1) {
     const { status } = errors[0]
 

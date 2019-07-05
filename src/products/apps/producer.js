@@ -26,7 +26,7 @@ const createQueue = (name) => {
 
 const jobQueue = createQueue('get-product-events')
 
-app.get('/produceGetJobs', async (req, res) => {
+app.get('/', async (req, res) => {
   // Parse the CSV rows
   const products = await getProductsFromCSV(CSVLocation)
   console.log(`${products.length} products parsed`)
