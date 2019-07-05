@@ -14,6 +14,25 @@ const Moltin = new MoltinGateway({
   client_secret: global.clientSecret
 })
 
+exports.formatProduct = async product => {
+  let newProduct = Object.assign({}, product)
+
+  newProduct.price = [
+    {
+    "amount": parseInt(product.price)*100,
+    "currency": "USD",
+    "includes_tax": false,
+  }
+]
+
+  newProduct.status =  "live"
+  newProduct.commodity_type = "physical",
+  newProduct.type = "product"
+  newProduct.manage_stock = false
+
+  return newProduct
+}
+
 exports.updateProduct = async product => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -26,6 +45,11 @@ exports.updateProduct = async product => {
 }
 
 exports.insertProduct = async product => {
+
+  console.log(product.price)
+
+  console.log(typeof product.price[0].amount)
+
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Moltin.Products.Create(product)

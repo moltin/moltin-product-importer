@@ -16,6 +16,7 @@ const {
   getProduct,
   updateProduct,
   insertProduct,
+  formatProduct
 } = require('./utils/moltinUtils')
 
 const arenaConfig = require('./utils/arenaConfig')
@@ -95,9 +96,11 @@ const updateJobProcessor = job => new Promise(async (resolve, reject) => {
 
 const insertProductProcessor = job => new Promise(async (resolve, reject) => {
   try {
-    await insertProduct(job.data.product)
-    resolve(`${job.data.product.sku} was inserted`)
+    const formattedProduct = await formatProduct(job.data.product)
+    await insertProduct(formattedProduct)
+    resolve(`${formattedProduct.sku} was inserted`)
   } catch (errorMessage) {
+    console.log(JSON.stringify(errorMessage.errors[0]))
     const result = await handleFailedInsertJob(insertJobQueue, job, errorMessage)
     reject(new Error(JSON.stringify(result)))
   }
