@@ -4,7 +4,7 @@ const fs = require('fs')
 const moltin = require('./moltinUtils')
 
 const parseFlowData = async (json) => {
-  const allowed = ['id', 'name', 'sku', 'description', 'manage_stock', 'slug']
+  const allowed = ['id', 'name', 'sku', 'description', 'manage_stock', 'slug', 'price', 'commodity_type', 'status', 'stock', 'weight']
 
   const flowData = Object.keys(json)
     .filter(key => !allowed.includes(key))
@@ -17,7 +17,7 @@ const parseFlowData = async (json) => {
 }
 
 const parseCoreData = async (json) => {
-  const required = ['name', 'sku', 'description', 'manage_stock', 'slug', 'status', 'commodity_type', 'price']
+  const required = ['name', 'sku', 'description', 'manage_stock', 'slug', 'status', 'commodity_type', 'price', 'weight']
 
   const missingCoreData = required
     .filter(key => !Object.keys(json).includes(key))
