@@ -1,18 +1,17 @@
-require('dotenv').config()
 var exports = module.exports = {}
 
 const { MoltinClient } = require('@moltin/request')
 
 const client = new MoltinClient({
-  client_id: process.env.MOLTIN_CLIENT_ID,
-  client_secret: process.env.MOLTIN_CLIENT_SECRET,
+  client_id: global.clientId,
+  client_secret: global.clientSecret
 })
 
 const MoltinGateway = require('@moltin/sdk').gateway
 
 const Moltin = new MoltinGateway({
-  client_id: process.env.MOLTIN_CLIENT_ID,
-  client_secret: process.env.MOLTIN_CLIENT_SECRET,
+  client_id: global.clientId,
+  client_secret: global.clientSecret
 })
 
 exports.updateProduct = async product => {

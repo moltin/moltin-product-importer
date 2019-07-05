@@ -26,40 +26,40 @@ const jobQueue = new Queue('get-product-events', `redis://${process.env.REDIS_HO
 const updateJobQueue = new Queue('update-product-events', `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
 const insertJobQueue = new Queue('insert-product-events', `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
 
-jobQueue.on('global:completed', (jobId, result) => {
-  console.log(`Job ${jobId} completed! Result: ${result}`)
-  jobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
+// jobQueue.on('global:completed', (jobId, result) => {
+//   console.log(`Job ${jobId} completed! Result: ${result}`)
+//   jobQueue.getJob(jobId).then((job) => {
+//     job.remove()
+//   })
+// })
 
-updateJobQueue.on('global:completed', (jobId, result) => {
-  console.log(`Job ${jobId} completed! Result: ${result}`)
-  updateJobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
+// updateJobQueue.on('global:completed', (jobId, result) => {
+//   console.log(`Job ${jobId} completed! Result: ${result}`)
+//   updateJobQueue.getJob(jobId).then((job) => {
+//     job.remove()
+//   })
+// })
 
-updateJobQueue.on('global:failed', (jobId, err) => {
-  console.log(`Job ${jobId} failed! Error: ${err}`)
-  updateJobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
+// updateJobQueue.on('global:failed', (jobId, err) => {
+//   console.log(`Job ${jobId} failed! Error: ${err}`)
+//   updateJobQueue.getJob(jobId).then((job) => {
+//     job.remove()
+//   })
+// })
 
-insertJobQueue.on('global:completed', (jobId, result) => {
-  console.log(`Job ${jobId} completed! Result: ${result}`)
-  insertJobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
+// insertJobQueue.on('global:completed', (jobId, result) => {
+//   console.log(`Job ${jobId} completed! Result: ${result}`)
+//   insertJobQueue.getJob(jobId).then((job) => {
+//     job.remove()
+//   })
+// })
 
-insertJobQueue.on('global:failed', (jobId, err) => {
-  console.log(`Job ${jobId} failed! Error: ${err}`)
-  insertJobQueue.getJob(jobId).then((job) => {
-    job.remove()
-  })
-})
+// insertJobQueue.on('global:failed', (jobId, err) => {
+//   console.log(`Job ${jobId} failed! Error: ${err}`)
+//   insertJobQueue.getJob(jobId).then((job) => {
+//     job.remove()
+//   })
+// })
 
 const getJobProcessor = job => new Promise(async (resolve, reject) => {
   try {

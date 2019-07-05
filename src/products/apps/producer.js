@@ -18,7 +18,7 @@ const {
   createProductsFlow
 } = require('./utils/moltinUtils')
 
-const CSVLocation = process.env.PRODUCTS_CSV
+const CSVLocation = global.csvPath
 
 const createQueue = (name) => {
   const jobQueue = new Queue(name, `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)

@@ -32,7 +32,8 @@
     "esm": "3.2.18",
     "express": "4.17.1",
     "fast-csv": "3.0.1",
-    "inquirer": "^6.4.1"
+    "inquirer": "^6.4.1",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@moltin/eslint-config": "1.0.0"
