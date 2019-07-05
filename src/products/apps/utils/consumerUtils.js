@@ -43,7 +43,7 @@ exports.handleFailedInsertJob = (queue, job, errorMessage) => {
   job.moveToFailed('failed', true)
 
   const { errors } = errorMessage
-
+  
   if (errors.length === 1) {
     const { status } = errors[0]
 

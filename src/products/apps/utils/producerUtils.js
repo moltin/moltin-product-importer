@@ -40,12 +40,16 @@ exports.analyseProducts = async (payload) => {
 exports.createMissingFlowData = async (flowID, analyseMoltinFlowDataResult) => {
   const newFieldsCreated = []
 
+  console.log('analyseMoltinFlowDataResult', JSON.stringify(analyseMoltinFlowDataResult))
+   
   for (const field of analyseMoltinFlowDataResult) {
     if (!newFieldsCreated.some(el => el === field)) {
       try {
-        console.log('creating field', field)
-        await moltin.createField(flowID, field)
-        newFieldsCreated.push(field)
+        if(field !== "") {
+          console.log('creating field', field)
+          await moltin.createField(flowID, field)
+          newFieldsCreated.push(field)
+        }
       } catch (e) {
         console.log(e)
       }
@@ -69,7 +73,8 @@ const analyseMoltinFlowData = async (flowData, attributesArray) => {
       results.push(field)
     }
   }
-  return results
+  const filteredResults = results.filter(el => el !== "")
+  return filteredResults
 }
 
 exports.getProductsFromCSV = async (fileLocation) => {
@@ -88,7 +93,6 @@ exports.getProductsFromCSV = async (fileLocation) => {
 
   const productsStream = fs.createReadStream(fileLocation)
   const csvStream = reader
-    // .transform(item => toMoltinObject(item))
     .on('data', data => objects.push(data))
     .on('end', () => {
       resolveCallback(objects)

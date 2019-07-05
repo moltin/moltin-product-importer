@@ -100,9 +100,9 @@ const insertProductProcessor = job => new Promise(async (resolve, reject) => {
     await insertProduct(formattedProduct)
     resolve(`${formattedProduct.sku} was inserted`)
   } catch (errorMessage) {
-    console.log(JSON.stringify(errorMessage.errors[0]))
-    const result = await handleFailedInsertJob(insertJobQueue, job, errorMessage)
-    reject(new Error(JSON.stringify(result)))
+    console.log(JSON.stringify(errorMessage))
+    await handleFailedInsertJob(insertJobQueue, job, errorMessage)
+    reject(new Error(JSON.stringify(errorMessage)))
   }
 })
 

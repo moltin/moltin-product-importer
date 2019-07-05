@@ -1,5 +1,4 @@
 var exports = module.exports = {}
-
 const { MoltinClient } = require('@moltin/request')
 
 const client = new MoltinClient({
@@ -45,11 +44,6 @@ exports.updateProduct = async product => {
 }
 
 exports.insertProduct = async product => {
-
-  console.log(product.price)
-
-  console.log(typeof product.price[0].amount)
-
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Moltin.Products.Create(product)
