@@ -9,12 +9,12 @@ const {
   addProductsToGetQueue,
   analyseProducts,
   createMissingFlowData,
-  analyseProductCoreData
+  analyseProductCoreData,
 } = require('./utils/producerUtils')
 
 const {
   findMoltinProductFlow,
-  createProductsFlow
+  createProductsFlow,
 } = require('./utils/moltinUtils')
 
 const CSVLocation = global.csvPath
@@ -33,7 +33,7 @@ app.get('/produceGetJobs', async (req, res) => {
 
   const missingCoreData = await analyseProductCoreData(products[0])
 
-  if(missingCoreData.length > 0) {
+  if (missingCoreData.length > 0) {
     console.log(`Your CSV row is missing the following required Moltin product fields, any inserts will therefore fail:\n${missingCoreData}`)
   }
   // Check if there are fields in the row which don't exist
@@ -41,7 +41,7 @@ app.get('/produceGetJobs', async (req, res) => {
 
   if (extraFieldsToCreate.length > 0) {
     console.log('your Moltin account is missing some fields on products found in the CSV, creating those now')
-    const productsFlow = await findMoltinProductFlow()
+    let productsFlow = await findMoltinProductFlow()
 
     if (productsFlow === undefined) {
       productsFlow = await createProductsFlow()
