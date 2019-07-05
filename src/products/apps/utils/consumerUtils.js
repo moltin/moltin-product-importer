@@ -16,7 +16,6 @@ exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
     })
 }
 
-
 exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
   const { errors } = errorMessage
 

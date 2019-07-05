@@ -13,7 +13,32 @@ const Moltin = new MoltinGateway({
   client_secret: global.clientSecret
 })
 
-exports.formatProduct = async product => {
+exports.formatProductForUpdate =(id, product) => {
+  let newProduct = Object.assign({}, product)
+
+  newProduct.type = 'product'
+  newProduct.id = id
+
+  return newProduct
+}
+
+exports.findProductId = async product => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await client.get(`products?filter=eq(sku,${product.sku})`)
+      const {data} = result
+
+      if(data.length === 1) {
+        resolve(data[0].id)
+      }
+      reject('no product found')
+    } catch(e) {
+      reject(e)
+    }
+  })
+}
+
+exports.formatProductForInsert = async product => {
   let newProduct = Object.assign({}, product)
 
   newProduct.price = [
