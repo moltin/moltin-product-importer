@@ -6,23 +6,12 @@
 3. Redis
 
 ## 🛠 Setup
-1. Rename `.example.env` to `.env` and add values
-```
-mv .example.env .env
-```
-
-3. Install dependancies
-```
-yarn
-```
-
-2. Link package
-```
-yarn link
-```
-
-3. Run
-```
+```bash
+npm init @moltin/import
+# or
+npx @moltin/import
+# or
+npm install -g @moltin/import
 import
 ```
 

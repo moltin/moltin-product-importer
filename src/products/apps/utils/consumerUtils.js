@@ -1,17 +1,4 @@
 var exports = module.exports = {}
-require('dotenv').config()
-const MoltinGateway = require('@moltin/sdk').gateway
-
-const Moltin = new MoltinGateway({
-  client_id: process.env.MOLTIN_CLIENT_ID,
-  client_secret: process.env.MOLTIN_CLIENT_SECRET,
-})
-
-exports.updateProduct = async product => await Moltin.Products.Update(product.id, product)
-exports.insertProduct = async product => await Moltin.Products.Create(product)
-exports.getProduct = async product => Moltin.Products.Filter({ eq: { sku: product } })
-  .All()
-  .then(data => data.data)
 
 exports.addProductToInsertQueue = async (jobQueue, product) => {
   jobQueue
@@ -31,8 +18,6 @@ exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
 
 
 exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
-  job.moveToFailed('failed', true)
-
   const { errors } = errorMessage
 
   if (errors.length === 1) {

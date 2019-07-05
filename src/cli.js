@@ -1,17 +1,10 @@
 import arg from 'arg'
 import inquirer from 'inquirer'
-import dotenv from 'dotenv'
 import chooseAndRunImport from './main'
+const {resolve} = require("path");
 
 async function promptForMissingOptions(options) {
   const defaultTemplate = 'products'
-
-  if (options.skipPrompts) {
-    return {
-      ...options,
-      template: options.template || defaultTemplate,
-    }
-  }
 
   const questions = []
   if (!options.entity) {
@@ -24,11 +17,38 @@ async function promptForMissingOptions(options) {
     })
   }
 
+  if(!options.csvPath) {
+    questions.push({
+      type: 'input',
+      name: 'csvPath',
+      message: 'Please provide the path to your CSV',
+    })
+  }
+
+  if(!options.clientId) {
+    questions.push({
+      type: 'input',
+      name: 'clientId',
+      message: 'Please provide the Moltin client ID for your store',
+    })
+  }
+
+  if(!options.clientSecret) {
+    questions.push({
+      type: 'input',
+      name: 'clientSecret',
+      message: 'Please provide the Moltin client secret for your store',
+    })
+  }
+
   const answers = await inquirer.prompt(questions)
 
   return {
     ...options,
     entity: options.entity || answers.entity,
+    csvPath: answers.csvPath,
+    clientId: answers.clientId,
+    clientSecret: answers.clientSecret
   }
 }
 
@@ -37,7 +57,9 @@ function parseArgumentsIntoOptions(rawArgs) {
     {
       '--entity': String,
       '-e': '--entity',
-      '--yes': Boolean,
+      '--csvPath': String,
+      '--clientId': String,
+      '--clientSecret': String
     },
     {
       argv: rawArgs.slice(2),
@@ -45,12 +67,19 @@ function parseArgumentsIntoOptions(rawArgs) {
   )
   return {
     entity: args['--entity'],
-    skipPrompts: args['--yes'] || false,
+    csvPath: args['--csvPath'],
+    clientId: args['--clientId'],
+    clientSecret: args['--clientSecret']
   }
 }
 
 export async function cli(args) {
   let options = parseArgumentsIntoOptions(args)
   options = await promptForMissingOptions(options)
+  const path = resolve(options.csvPath)
+
+  global.csvPath = path
+  global.clientId = options.clientId
+  global.clientSecret = options.clientSecret
   await chooseAndRunImport(options.entity)
 }
