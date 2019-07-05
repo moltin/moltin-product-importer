@@ -95,14 +95,14 @@ const updateJobProcessor = job => new Promise(async (resolve, reject) => {
     resolve()
   } catch (errorMessage) {
     console.log(errorMessage)
-    // const result = await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
+    await handleFailedUpdateJob(updateJobQueue, job, errorMessage)
     reject(new Error(JSON.stringify(errorMessage)))
   }
 })
 
 const insertProductProcessor = job => new Promise(async (resolve, reject) => {
   try {
-    const formattedProduct = await formatProduct(job.data.product)
+    const formattedProduct = await formatProductForInsert(job.data.product)
     await insertProduct(formattedProduct)
     resolve(`${formattedProduct.sku} was inserted`)
   } catch (errorMessage) {
