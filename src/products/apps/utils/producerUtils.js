@@ -3,14 +3,6 @@ const csv = require('fast-csv')
 const fs = require('fs')
 const moltin = require('./moltinUtils')
 
-const toMoltinObject = data => ({
-  // left is moltin || right is CSV
-  sku: data.sku,
-  name: data.name,
-  description: data.description,
-  slug: data.slug,
-})
-
 const parseFlowData = async (json) => {
   const allowed = ['id', 'name', 'sku', 'description', 'manage_stock', 'slug']
 
@@ -25,21 +17,20 @@ const parseFlowData = async (json) => {
 }
 
 const parseCoreData = async (json) => {
-  const allowed = ['id', 'name', 'sku', 'description', 'manage_stock', 'slug', 'status', 'commodity_type', 'price']
+  const required = ['name', 'sku', 'description', 'manage_stock', 'slug', 'status', 'commodity_type', 'price']
 
-  const coreData = Object.keys(json)
-    .filter(key => allowed.includes(key))
-    .reduce((obj, key) => {
-      obj[key] = json[key]
-      return obj
-    }, {})
+  const missingCoreData = required
+    .filter(key => !Object.keys(json).includes(key))
+   
+  return missingCoreData
+}
 
-  return coreData
+exports.analyseProductCoreData = async (payload) => {
+  return await parseCoreData(payload)
 }
 
 exports.analyseProducts = async (payload) => {
   const attributesArray = await checkProductAttributes()
-  const coreData = await parseCoreData(payload)
   const flowData = await parseFlowData(payload)
 
   const analyseMoltinFlowDataResult = await analyseMoltinFlowData(flowData, attributesArray)

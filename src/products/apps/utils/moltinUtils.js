@@ -63,7 +63,7 @@ exports.createField = async (flowID, fieldName) => new Promise(async (resolve, r
       name: fieldName,
       description: fieldName,
       required: false,
-      omit_null: false,
+      omit_null: true,
       unique: false,
       relationships: {
         flow: {
