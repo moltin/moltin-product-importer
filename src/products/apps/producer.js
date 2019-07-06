@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Queue = require('bull')
 const express = require('express')
 const redis = require("redis")
@@ -17,7 +18,7 @@ const {
   createProductsFlow,
 } = require('./utils/moltinUtils')
 
-const CSVLocation = global.csvPath
+const CSVLocation = process.env.csvPath
 
 const createQueue = (name) => {
   const jobQueue = new Queue(name, 'redis://127.0.0.1:6379')
@@ -61,7 +62,7 @@ app.get('/', async (req, res) => {
   }
 })
 
-app.get('/flushJobs', (req, res) => {
+app.get('/flushJobs', async (req, res) => {
   client = await redis.createClient()
   await client.flushall()
   res.send('all jobs have been flushed from Redis')
