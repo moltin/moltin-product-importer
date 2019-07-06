@@ -78,28 +78,31 @@ const analyseMoltinFlowData = async (flowData, attributesArray) => {
 }
 
 exports.getProductsFromCSV = async (fileLocation) => {
-  let resolveCallback
-  const promise = new Promise((resolve) => {
-    resolveCallback = resolve
+  return new Promise((resolve, reject) => {
+    try {
+      const objects = []
+
+      const reader = csv.parse({
+        headers: true,
+        objectMode: true,
+        ignoreEmpty: true,
+      })
+
+      const productsStream = fs.createReadStream(fileLocation)
+      productsStream.on('error', function(){
+        reject('Cannot find your CSV file')
+      })
+
+      const csvStream = reader
+        .on('data', data => objects.push(data))
+        .on('end', () => {
+          resolve(objects)
+        })
+      productsStream.pipe(csvStream)
+    } catch(e) {
+      reject(e)
+    }
   })
-
-  const objects = []
-
-  const reader = csv.parse({
-    headers: true,
-    objectMode: true,
-    ignoreEmpty: true,
-  })
-
-  const productsStream = fs.createReadStream(fileLocation)
-  const csvStream = reader
-    .on('data', data => objects.push(data))
-    .on('end', () => {
-      resolveCallback(objects)
-    })
-  productsStream.pipe(csvStream)
-
-  return promise
 }
 
 const addProductToGetQueue = async (jobQueue, product) => {
