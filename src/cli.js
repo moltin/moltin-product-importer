@@ -2,10 +2,12 @@ import arg from 'arg'
 import inquirer from 'inquirer'
 import chooseAndRunImport from './main'
 const resolvePath = require("path").resolve;
-const fs = require('fs')
-const dotenv = require('dotenv')
-const envfile = require('envfile')
-const path = require('path')
+import fs from 'fs'
+import dotenv from 'dotenv'
+import envfile from 'envfile'
+import path from 'path'
+import figlet from 'figlet'
+import chalk from 'chalk'
 
 async function fetchEnvFile() {
   return new Promise((resolve, reject) => {
@@ -24,7 +26,7 @@ async function fetchEnvFile() {
       if (err.code === 'ENOENT') {
           resolve(false)
       } else {
-        reject(JSON.stringify(error));
+        reject(JSON.stringify(err));
       }
     }
   })
@@ -218,6 +220,7 @@ async function collectAndWriteEnvVars(options) {
 
 export async function cli(args) {
   try {
+    console.log(chalk.green(figlet.textSync('moltin-importer', { horizontalLayout: 'full' })))
     let options = parseArgumentsIntoOptions(args)
     const { entity } = await promptForMissingEntity(args)
     const env = await fetchEnvFile()
