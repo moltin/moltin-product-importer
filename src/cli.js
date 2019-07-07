@@ -1,10 +1,11 @@
 import arg from 'arg'
 import inquirer from 'inquirer'
 import chooseAndRunImport from './main'
-const {resolve} = require("path");
+const resolvePath = require("path").resolve;
 const fs = require('fs')
 const dotenv = require('dotenv')
 const envfile = require('envfile')
+const path = require('path')
 
 async function fetchEnvFile() {
   return new Promise((resolve, reject) => {
@@ -13,7 +14,6 @@ async function fetchEnvFile() {
       if (result.error) {
         throw result.error
       }
-      console.log(result.parsed)
       const r = result.parsed
       if(r.clientId && r.clientSecret && r.csvPath) {
         resolve(true)
@@ -41,7 +41,7 @@ async function writeEnvVars(options) {
 
       const newEnv = await envfile.stringifySync(sourceObject)
       const newEnvBuffer = Buffer.from(newEnv)
-      await fs.writeFileSync('../.env', newEnvBuffer)
+      await fs.writeFileSync('./.env', newEnvBuffer)
       resolve()
     } catch(e) {
       console.log(e)
@@ -76,7 +76,7 @@ async function promptForMissingOptions(options) {
     questions.push({
       type: 'input',
       name: 'csvPath',
-      message: 'Please provide the path to your CSV',
+      message: `Please provide a path to your CSV, your current directory is ${path.join(__dirname, '../')}`,
     })
   }
 
@@ -153,8 +153,9 @@ async function collectAndWriteEnvVars(options) {
   return new Promise(async (resolve, reject) => {
     try {
       options = await promptForMissingOptions(options)
+      const relativeCsvPath = resolvePath(options.csvPath)
+      options.csvPath = relativeCsvPath
       await writeEnvVars(options)
-      console.log(options)
       resolve(options)
     } catch(e) {
       reject(e)
@@ -170,17 +171,13 @@ export async function cli(args) {
     if(env) {
       const { shouldReplaceVars } = await promptForShouldChangeVars()
       if(shouldReplaceVars === 'yes') {
-        const newOptions = await collectAndWriteEnvVars(options)
-        const csvPath = resolve(newOptions.csvPath)
-        options.csvPath = csvPath
+        await collectAndWriteEnvVars(options)
         chooseAndRunImport(entity)
       } else {
         chooseAndRunImport(entity)
       }
     } else {
-      const newOptions = await collectAndWriteEnvVars(options)
-      const csvPath = resolve(newOptions.csvPath)
-      newOptions.csvPath = csvPath
+      await collectAndWriteEnvVars(options)
       chooseAndRunImport(entity)
     }
   } catch(e) {
