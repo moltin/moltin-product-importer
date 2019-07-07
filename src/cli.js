@@ -10,7 +10,7 @@ const path = require('path')
 async function fetchEnvFile() {
   return new Promise((resolve, reject) => {
     try {
-      const result = dotenv.config({ path: '../.env' })
+      const result = dotenv.config({ path: './.env' })
       if (result.error) {
         throw result.error
       }
@@ -30,6 +30,44 @@ async function fetchEnvFile() {
   })
 }
 
+async function promptForRedisDefault() {
+  const defaultTemplate = 'yes'
+
+  const question = [{
+    type: 'list',
+    name: 'isRedisDefault',
+    message: 'Do you have Redis running using the default port and host?',
+    choices: ['yes', 'no'],
+    default: defaultTemplate,
+  }]
+
+  const answer = await inquirer.prompt(question)
+
+  return answer.isRedisDefault
+  
+}
+
+async function promptForRedisConfig() {
+  const questions = [
+    {
+      type: 'input',
+      name: 'redisPort',
+      message: 'What port is Redis running on?',
+    }, {
+      type: 'input',
+      name: 'redisHost',
+      message: 'What host is Redis running on?',
+    },
+  ]
+
+  const answers = await inquirer.prompt(questions)
+
+  return {
+    redisPort: answers.redisPort,
+    redisHost: answers.redisHost
+  }
+}
+
 async function writeEnvVars(options) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -37,9 +75,12 @@ async function writeEnvVars(options) {
         clientId: options.clientId,
         clientSecret: options.clientSecret,
         csvPath: options.csvPath,
+        redisHost: options.redisHost,
+        redisPort: options.redisPort
       }
 
       const newEnv = await envfile.stringifySync(sourceObject)
+
       const newEnvBuffer = Buffer.from(newEnv)
       await fs.writeFileSync('./.env', newEnvBuffer)
       resolve()
@@ -56,7 +97,7 @@ async function promptForShouldChangeVars() {
   const question = [{
     type: 'list',
     name: 'shouldReplaceVars',
-    message: 'Would you like to change the Moltin credentials or CSV path?',
+    message: 'Would you like to change the Moltin credentials, CSV path or Redis config?',
     choices: ['yes', 'no'],
     default: defaultTemplate,
   }]
@@ -155,6 +196,18 @@ async function collectAndWriteEnvVars(options) {
       options = await promptForMissingOptions(options)
       const relativeCsvPath = resolvePath(options.csvPath)
       options.csvPath = relativeCsvPath
+
+      const isRedisDefault = await promptForRedisDefault()
+
+      if(isRedisDefault === 'no') {
+        const redisConfig = await promptForRedisConfig()
+        options.redisHost = redisConfig.redisHost
+        options.redisPort = redisConfig.redisPort
+      } else {
+        options.redisHost = '127.0.0.1'
+        options.redisPort = '6379' 
+      }
+
       await writeEnvVars(options)
       resolve(options)
     } catch(e) {
@@ -172,8 +225,10 @@ export async function cli(args) {
       const { shouldReplaceVars } = await promptForShouldChangeVars()
       if(shouldReplaceVars === 'yes') {
         await collectAndWriteEnvVars(options)
+        dotenv.config({ path: './.env' })
         chooseAndRunImport(entity)
       } else {
+        dotenv.config({ path: './.env' })
         chooseAndRunImport(entity)
       }
     } else {
