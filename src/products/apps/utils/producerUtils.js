@@ -32,7 +32,6 @@ exports.analyseProductCoreData = async (payload) => {
 exports.analyseProducts = async (payload) => {
   const attributesArray = await checkProductAttributes()
   const flowData = await parseFlowData(payload)
-
   const analyseMoltinFlowDataResult = await analyseMoltinFlowData(flowData, attributesArray)
   return analyseMoltinFlowDataResult
 }

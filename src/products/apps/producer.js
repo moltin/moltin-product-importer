@@ -19,9 +19,10 @@ const {
 } = require('./utils/moltinUtils')
 
 const CSVLocation = process.env.csvPath
+const redisUrl = `redis://${process.env.redisHost}:${process.env.redisPort}`
 
 const createQueue = (name) => {
-  const jobQueue = new Queue(name, 'redis://127.0.0.1:6379')
+  const jobQueue = new Queue(name, redisUrl)
   return jobQueue
 }
 
@@ -31,14 +32,12 @@ app.get('/', async (req, res) => {
   try {
     // Parse the CSV rows
     const products = await getProductsFromCSV(CSVLocation)
-    console.log(`${products.length} products parsed`)
-
     const missingCoreData = await analyseProductCoreData(products[0])
 
     if (missingCoreData.length > 0) {
       console.log(`Your CSV row is missing the following required Moltin product fields, any inserts will therefore fail:\n${missingCoreData}`)
     }
-    // Check if there are fields in the row which don't exist
+
     const extraFieldsToCreate = await analyseProducts(products[0])
 
     if (extraFieldsToCreate.length > 0) {
@@ -56,7 +55,7 @@ app.get('/', async (req, res) => {
     const count = await jobQueue.count()
     console.log(`job count is ${count}`)
 
-    res.send('Done!')
+    res.send('Done!\n')
   } catch(e) {
     res.send(JSON.stringify(e))
   }
@@ -65,7 +64,7 @@ app.get('/', async (req, res) => {
 app.get('/flushJobs', async (req, res) => {
   client = await redis.createClient()
   await client.flushall()
-  res.send('all jobs have been flushed from Redis')
+  res.send('All jobs have been flushed from Redis\n')
 })
 
 app.listen(port, () => console.log(`Producer app running on port ${port}`))

@@ -24,10 +24,11 @@ const {
 const arenaConfig = require('./utils/arenaConfig')
 
 const arena = Arena(arenaConfig.config)
+const redisUrl = `redis://${process.env.redisHost}:${process.env.redisPort}`
 
-const jobQueue = new Queue('get-product-events', 'redis://127.0.0.1:6379')
-const updateJobQueue = new Queue('update-product-events', 'redis://127.0.0.1:6379')
-const insertJobQueue = new Queue('insert-product-events', 'redis://127.0.0.1:6379')
+const jobQueue = new Queue('get-product-events', redisUrl)
+const updateJobQueue = new Queue('update-product-events', redisUrl)
+const insertJobQueue = new Queue('insert-product-events', redisUrl)
 
 // jobQueue.on('global:completed', (jobId, result) => {
 //   console.log(`Job ${jobId} completed! Result: ${result}`)
