@@ -1,2 +1,3 @@
-require = require('esm')(module)
-require('../src/cli').cli(process.argv)
+import cli from './cli'
+
+cli(process.argv)

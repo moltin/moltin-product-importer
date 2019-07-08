@@ -1,9 +1,12 @@
+/* eslint no-console: ["error", { allow: ["warn", "log"] }] */
+
 import chalk from 'chalk'
+import runProductsApps from './products/index'
 
 export default async function chooseAndRunImport(entity) {
   switch (entity) {
     case 'products':
-      require('./products/index')
+      runProductsApps()
       break
     default:
       console.log('entity not available for import')

@@ -1,31 +1,28 @@
-const Queue = require('bull')
-const Arena = require('bull-arena')
-const express = require('express')
+/* eslint no-console: ["error", { allow: ["warn", "log"] }] */
 
-const app = express()
-const port = 3000
-
-const {
+import {
   addProductToUpdateQueue,
   addProductToInsertQueue,
   handleFailedInsertJob,
   handleFailedUpdateJob,
-} = require('./utils/consumerUtils')
+} from './utils/consumerUtils'
 
-const {
+import {
   getProduct,
   updateProduct,
   insertProduct,
   formatProductForUpdate,
   formatProductForInsert,
-  findProductId
-} = require('./utils/moltinUtils')
+  findProductId,
+} from './utils/moltinUtils'
 
-const arenaConfig = require('./utils/arenaConfig')
+import arenaConfig from './utils/arenaConfig'
 
-const arena = Arena(arenaConfig.config)
+const Queue = require('bull')
+const Arena = require('bull-arena')
+const express = require('express')
+
 const redisUrl = `redis://${process.env.redisHost}:${process.env.redisPort}`
-
 const jobQueue = new Queue('get-product-events', redisUrl)
 const updateJobQueue = new Queue('update-product-events', redisUrl)
 const insertJobQueue = new Queue('insert-product-events', redisUrl)
@@ -64,6 +61,7 @@ const insertJobQueue = new Queue('insert-product-events', redisUrl)
 //     job.remove()
 //   })
 // })
+
 
 const getJobProcessor = job => new Promise(async (resolve, reject) => {
   try {
@@ -113,9 +111,16 @@ const insertProductProcessor = job => new Promise(async (resolve, reject) => {
   }
 })
 
-jobQueue.process('get-product', getJobProcessor)
-updateJobQueue.process('update-product', updateJobProcessor)
-insertJobQueue.process('insert-product', insertProductProcessor)
+export default function consumer() {
+  const arena = Arena(arenaConfig.config)
 
-app.use('/arena', arena)
-app.listen(port, () => console.log(`Consumer app running on port ${port}`))
+  const app = express()
+  const port = 3000
+
+  jobQueue.process('get-product', getJobProcessor)
+  updateJobQueue.process('update-product', updateJobProcessor)
+  insertJobQueue.process('insert-product', insertProductProcessor)
+
+  app.use('/arena', arena)
+  app.listen(port, () => console.log(`Consumer app running on port ${port}`))
+}

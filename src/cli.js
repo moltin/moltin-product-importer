@@ -1,13 +1,17 @@
+/* eslint no-console: ["error", { allow: ["warn", "log"] }] */
+
 import arg from 'arg'
 import inquirer from 'inquirer'
-import chooseAndRunImport from './main'
-const resolvePath = require("path").resolve;
 import fs from 'fs'
 import dotenv from 'dotenv'
 import envfile from 'envfile'
 import path from 'path'
 import figlet from 'figlet'
 import chalk from 'chalk'
+import { merge } from 'lodash'
+import chooseAndRunImport from './main'
+
+const resolvePath = require('path').resolve
 
 async function fetchEnvFile() {
   return new Promise((resolve, reject) => {
@@ -17,16 +21,16 @@ async function fetchEnvFile() {
         throw result.error
       }
       const r = result.parsed
-      if(r.clientId && r.clientSecret && r.csvPath) {
+      if (r.clientId && r.clientSecret && r.csvPath) {
         resolve(true)
       } else {
         resolve(false)
       }
     } catch (err) {
       if (err.code === 'ENOENT') {
-          resolve(false)
+        resolve(false)
       } else {
-        reject(JSON.stringify(err));
+        reject(JSON.stringify(err))
       }
     }
   })
@@ -46,7 +50,6 @@ async function promptForRedisDefault() {
   const answer = await inquirer.prompt(question)
 
   return answer.isRedisDefault
-  
 }
 
 async function promptForRedisConfig() {
@@ -66,7 +69,7 @@ async function promptForRedisConfig() {
 
   return {
     redisPort: answers.redisPort,
-    redisHost: answers.redisHost
+    redisHost: answers.redisHost,
   }
 }
 
@@ -78,7 +81,7 @@ async function writeEnvVars(options) {
         clientSecret: options.clientSecret,
         csvPath: options.csvPath,
         redisHost: options.redisHost,
-        redisPort: options.redisPort
+        redisPort: options.redisPort,
       }
 
       const newEnv = await envfile.stringifySync(sourceObject)
@@ -86,7 +89,7 @@ async function writeEnvVars(options) {
       const newEnvBuffer = Buffer.from(newEnv)
       await fs.writeFileSync('./.env', newEnvBuffer)
       resolve()
-    } catch(e) {
+    } catch (e) {
       console.log(e)
       reject(e)
     }
@@ -107,15 +110,14 @@ async function promptForShouldChangeVars() {
   const answer = await inquirer.prompt(question)
 
   return {
-    shouldReplaceVars: answer.shouldReplaceVars
+    shouldReplaceVars: answer.shouldReplaceVars,
   }
 }
 
 async function promptForMissingOptions(options) {
-  
-  let questions = []
+  const questions = []
 
-  if(!options.csvPath) {
+  if (!options.csvPath) {
     questions.push({
       type: 'input',
       name: 'csvPath',
@@ -123,7 +125,7 @@ async function promptForMissingOptions(options) {
     })
   }
 
-  if(!options.clientId) {
+  if (!options.clientId) {
     questions.push({
       type: 'input',
       name: 'clientId',
@@ -131,7 +133,7 @@ async function promptForMissingOptions(options) {
     })
   }
 
-  if(!options.clientSecret) {
+  if (!options.clientSecret) {
     questions.push({
       type: 'input',
       name: 'clientSecret',
@@ -145,7 +147,7 @@ async function promptForMissingOptions(options) {
     ...options,
     csvPath: answers.csvPath,
     clientId: answers.clientId,
-    clientSecret: answers.clientSecret
+    clientSecret: answers.clientSecret,
   }
 }
 
@@ -153,7 +155,7 @@ async function promptForMissingEntity(options) {
   const defaultTemplate = 'products'
 
   const questions = []
-  
+
   if (!options.entity) {
     questions.push({
       type: 'list',
@@ -167,7 +169,7 @@ async function promptForMissingEntity(options) {
   const answers = await inquirer.prompt(questions)
 
   return {
-    entity: options.entity || answers.entity
+    entity: options.entity || answers.entity,
   }
 }
 
@@ -178,7 +180,7 @@ function parseArgumentsIntoOptions(rawArgs) {
       '-e': '--entity',
       '--csvPath': String,
       '--clientId': String,
-      '--clientSecret': String
+      '--clientSecret': String,
     },
     {
       argv: rawArgs.slice(2),
@@ -188,45 +190,54 @@ function parseArgumentsIntoOptions(rawArgs) {
     entity: args['--entity'],
     csvPath: args['--csvPath'],
     clientId: args['--clientId'],
-    clientSecret: args['--clientSecret']
+    clientSecret: args['--clientSecret'],
   }
+}
+
+async function addToOptions(kv, options) {
+  await merge(options, kv)
 }
 
 async function collectAndWriteEnvVars(options) {
   return new Promise(async (resolve, reject) => {
     try {
-      options = await promptForMissingOptions(options)
-      const relativeCsvPath = resolvePath(options.csvPath)
-      options.csvPath = relativeCsvPath
-
+      let collectedOptions = await promptForMissingOptions(options)
+      const relativeCsvPath = resolvePath(collectedOptions.csvPath)
+      collectedOptions = addToOptions({ csvPath: relativeCsvPath }, collectedOptions)
       const isRedisDefault = await promptForRedisDefault()
 
-      if(isRedisDefault === 'no') {
+      if (isRedisDefault === 'no') {
         const redisConfig = await promptForRedisConfig()
-        options.redisHost = redisConfig.redisHost
-        options.redisPort = redisConfig.redisPort
+        collectedOptions = await addToOptions(
+          { redisHost: redisConfig.redisHost },
+          collectedOptions,
+        )
+        collectedOptions = await addToOptions(
+          { redisPort: redisConfig.redisPort },
+          collectedOptions,
+        )
       } else {
-        options.redisHost = '127.0.0.1'
-        options.redisPort = '6379' 
+        collectedOptions = await addToOptions({ redisHost: '127.0.0.1' }, collectedOptions)
+        collectedOptions = await addToOptions({ redisPort: '6379' }, collectedOptions)
       }
 
-      await writeEnvVars(options)
-      resolve(options)
-    } catch(e) {
+      await writeEnvVars(collectedOptions)
+      resolve(collectedOptions)
+    } catch (e) {
       reject(e)
     }
   })
 }
 
-export async function cli(args) {
+export default async function cli(args) {
   try {
     console.log(chalk.green(figlet.textSync('moltin-importer', { horizontalLayout: 'full' })))
-    let options = parseArgumentsIntoOptions(args)
+    const options = parseArgumentsIntoOptions(args)
     const { entity } = await promptForMissingEntity(args)
     const env = await fetchEnvFile()
-    if(env) {
+    if (env) {
       const { shouldReplaceVars } = await promptForShouldChangeVars()
-      if(shouldReplaceVars === 'yes') {
+      if (shouldReplaceVars === 'yes') {
         await collectAndWriteEnvVars(options)
         dotenv.config({ path: './.env' })
         chooseAndRunImport(entity)
@@ -238,7 +249,7 @@ export async function cli(args) {
       await collectAndWriteEnvVars(options)
       chooseAndRunImport(entity)
     }
-  } catch(e) {
-    console.error(e)
+  } catch (e) {
+    console.log(e)
   }
 }
