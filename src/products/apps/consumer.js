@@ -59,7 +59,6 @@ const express = require('express')
 // })
 
 export default function consumer() {
-
   const redisUrl = `redis://${process.env.redisHost}:${process.env.redisPort}`
   const jobQueue = new Queue('get-product-events', redisUrl)
   const updateJobQueue = new Queue('update-product-events', redisUrl)
@@ -109,7 +108,7 @@ export default function consumer() {
       await handleFailedInsertJob(insertJobQueue, job, errorMessage)
       reject(new Error(JSON.stringify(errorMessage)))
     }
-})
+  })
 
   const arena = Arena(arenaConfig)
 

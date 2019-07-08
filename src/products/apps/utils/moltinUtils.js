@@ -81,7 +81,7 @@ export async function insertProduct(product) {
 }
 
 export async function getProduct(product) {
-  const {data} = await Moltin.Products.Filter({ eq: { sku: product } })
+  const { data } = await Moltin.Products.Filter({ eq: { sku: product } })
     .All()
   return data
 }
