@@ -7,12 +7,8 @@
 
 ## 🛠 Setup
 ```bash
-npm init @moltin/import
-# or
-npx @moltin/import
-# or
-npm install -g @moltin/import
-moltin-import
+npm install -g @moltin/importer
+importer
 ```
 
 ## ⛽️ Usage
