@@ -529,6 +529,11 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
+app-root-path@~2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.0.1.tgz#cd62dcf8e4fd5a417efc664d2e5b10653c651b46"
+  integrity sha1-zWLc+OT9WkF+/GZNLlsQZTxlG0Y=
+
 aproba@^1.0.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
@@ -1130,6 +1135,13 @@ conventional-changelog-angular@^1.3.3:
   dependencies:
     compare-func "^1.3.1"
     q "^1.5.1"
+
+conventional-changelog-lint-config-cz@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/conventional-changelog-lint-config-cz/-/conventional-changelog-lint-config-cz-0.3.0.tgz#082e05823a63f064551f0f8df846c4f8d18eaf69"
+  integrity sha1-CC4Fgjpj8GRVHw+N+EbE+NGOr2k=
+  dependencies:
+    app-root-path "~2.0.1"
 
 conventional-commits-parser@^2.1.0:
   version "2.1.7"
