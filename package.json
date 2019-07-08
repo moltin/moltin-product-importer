@@ -11,8 +11,8 @@
     "pretest": "./node_modules/.bin/eslint --ignore-path .gitignore . --fix"
   },
   "bin": {
-    "@moltin/import": "bin/import",
-    "import": "bin/import"
+    "@moltin/importer": "bin/import",
+    "importer": "bin/import"
   },
   "publishConfig": {
     "access": "public"
