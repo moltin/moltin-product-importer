@@ -203,7 +203,7 @@ async function collectAndWriteEnvVars(options) {
     try {
       let collectedOptions = await promptForMissingOptions(options)
       const relativeCsvPath = resolvePath(collectedOptions.csvPath)
-      collectedOptions = addToOptions({ csvPath: relativeCsvPath }, collectedOptions)
+      collectedOptions = await addToOptions({ csvPath: relativeCsvPath }, collectedOptions)
       const isRedisDefault = await promptForRedisDefault()
 
       if (isRedisDefault === 'no') {
