@@ -1,20 +1,21 @@
-var exports = module.exports = {}
+require('dotenv').config()
+
 const { MoltinClient } = require('@moltin/request')
 
 const client = new MoltinClient({
-  client_id: global.clientId,
-  client_secret: global.clientSecret
+  client_id: process.env.clientId,
+  client_secret: process.env.clientSecret,
 })
 
 const MoltinGateway = require('@moltin/sdk').gateway
 
 const Moltin = new MoltinGateway({
-  client_id: global.clientId,
-  client_secret: global.clientSecret
+  client_id: process.env.clientId,
+  client_secret: process.env.clientSecret,
 })
 
-exports.formatProductForUpdate =(id, product) => {
-  let newProduct = Object.assign({}, product)
+export async function formatProductForUpdate(id, product) {
+  const newProduct = Object.assign({}, product)
 
   newProduct.type = 'product'
   newProduct.id = id
@@ -22,137 +23,149 @@ exports.formatProductForUpdate =(id, product) => {
   return newProduct
 }
 
-exports.findProductId = async product => {
+export async function findProductId(product) {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await client.get(`products?filter=eq(sku,${product.sku})`)
-      const {data} = result
+      const { data } = result
 
-      if(data.length === 1) {
+      if (data.length === 1) {
         resolve(data[0].id)
       }
-      reject('no product found')
-    } catch(e) {
+      reject(new Error('no product found'))
+    } catch (e) {
       reject(e)
     }
   })
 }
 
-exports.formatProductForInsert = async product => {
-  let newProduct = Object.assign({}, product)
+export async function formatProductForInsert(product) {
+  const newProduct = Object.assign({}, product)
 
   newProduct.price = [
     {
-    "amount": parseInt(product.price)*100,
-    "currency": "USD",
-    "includes_tax": false,
-  }
-]
+      amount: parseInt(product.price, 10) * 100,
+      currency: 'USD',
+      includes_tax: false,
+    },
+  ]
 
-  newProduct.status =  "live"
-  newProduct.commodity_type = "physical",
-  newProduct.type = "product"
+  newProduct.status = 'live'
+  newProduct.commodity_type = 'physical'
+  newProduct.type = 'product'
   newProduct.manage_stock = false
 
   return newProduct
 }
 
-exports.updateProduct = async product => {
+export async function updateProduct(product) {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Moltin.Products.Update(product.id, product)
       resolve(result)
-    } catch(e) {
+    } catch (e) {
       reject(e)
     }
   })
 }
 
-exports.insertProduct = async product => {
+export async function insertProduct(product) {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Moltin.Products.Create(product)
       resolve(result)
-    } catch(e) {
+    } catch (e) {
       reject(e)
     }
   })
 }
 
-exports.getProduct = async product => Moltin.Products.Filter({ eq: { sku: product } })
-  .All()
-  .then(data => data.data)
+export async function getProduct(product) {
+  Moltin.Products.Filter({ eq: { sku: product } })
+    .All()
+    .then(data => data.data)
+}
 
-exports.createProductsFlow = async () => new Promise(async (resolve, reject) => {
-  try {
-    const payload = {
-      type: 'flow',
-      name: 'products',
-      slug: 'products',
-      enabled: true,
-      description: 'products',
+export async function createProductsFlow() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const payload = {
+        type: 'flow',
+        name: 'products',
+        slug: 'products',
+        enabled: true,
+        description: 'products',
+      }
+
+      const flow = await client.post('flows', payload)
+      resolve(flow)
+    } catch (e) {
+      reject(e)
     }
+  })
+}
 
-    const flow = await client.post('flows', payload)
-    resolve(flow)
-  } catch (e) {
-    reject(e)
-  }
-})
+export async function findMoltinProductFlow() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const flows = await client.get('flows')
 
-exports.findMoltinProductFlow = async () => new Promise(async (resolve, reject) => {
-  try {
-    const flows = await client.get('flows')
+      const productsFlow = flows.data.find(flow => flow.slug === 'products')
 
-    const flow = flows.data.find(flow => flow.slug === 'products')
+      resolve(productsFlow)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-    resolve(flow)
-  } catch (e) {
-    reject(e)
-  }
-})
+export async function update(id, payload) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await client.put(`products/${id}`, payload)
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-exports.update = async (id, payload) => new Promise(async (resolve, reject) => {
-  try {
-    await client.put(`products/${id}`, payload)
-    resolve()
-  } catch (e) {
-    reject(e)
-  }
-})
+export async function getAttributes() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const attributes = await client.get('products/attributes')
+      resolve(attributes)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-exports.getAttributes = async () => new Promise(async (resolve, reject) => {
-  try {
-    const attributes = await client.get('products/attributes')
-    resolve(attributes)
-  } catch (e) {
-    reject(e)
-  }
-})
-
-exports.createField = async (flowID, fieldName) => new Promise(async (resolve, reject) => {
-  try {
-    const payload = {
-      type: 'field',
-      field_type: 'string',
-      slug: fieldName.replace(/[^A-Z0-9]/gi, '_'),
-      name: fieldName,
-      description: fieldName,
-      required: false,
-      omit_null: true,
-      unique: false,
-      relationships: {
-        flow: {
-          data: {
-            type: 'flow',
-            id: flowID,
+export async function createField(flowID, fieldName) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const payload = {
+        type: 'field',
+        field_type: 'string',
+        slug: fieldName.replace(/[^A-Z0-9]/gi, '_'),
+        name: fieldName,
+        description: fieldName,
+        required: false,
+        omit_null: true,
+        unique: false,
+        relationships: {
+          flow: {
+            data: {
+              type: 'flow',
+              id: flowID,
+            },
           },
         },
-      },
+      }
+      await client.post('fields', payload)
+      resolve()
+    } catch (e) {
+      reject(e)
     }
-    await client.post('fields', payload)
-    resolve()
-  } catch (e) {
-    reject(e)
-  }
-})
+  })
+}

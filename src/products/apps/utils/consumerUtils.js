@@ -1,6 +1,6 @@
-var exports = module.exports = {}
+/* eslint no-console: ["error", { allow: ["warn", "log"] }] */
 
-exports.addProductToInsertQueue = async (jobQueue, product) => {
+export async function addProductToInsertQueue(jobQueue, product) {
   jobQueue
     .add('insert-product', {
       title: `Inserting product ${product.sku}`,
@@ -8,7 +8,7 @@ exports.addProductToInsertQueue = async (jobQueue, product) => {
     })
 }
 
-exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
+export async function addProductToUpdateQueue(jobQueue, updatedProduct) {
   jobQueue
     .add('update-product', {
       title: `Updating product ${updatedProduct.sku}`,
@@ -16,7 +16,7 @@ exports.addProductToUpdateQueue = async (jobQueue, updatedProduct) => {
     })
 }
 
-exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
+export async function handleFailedUpdateJob(queue, job, errorMessage) {
   const { errors } = errorMessage
 
   if (errors.length === 1) {
@@ -38,11 +38,11 @@ exports.handleFailedUpdateJob = (queue, job, errorMessage) => {
   return (errors)
 }
 
-exports.handleFailedInsertJob = (queue, job, errorMessage) => {
+export async function handleFailedInsertJob(queue, job, errorMessage) {
   job.moveToFailed('failed', true)
 
   const { errors } = errorMessage
-  
+
   if (errors.length === 1) {
     const { status } = errors[0]
 

@@ -1,0 +1,9 @@
+    
+{
+    "extends": ["config:base", "docker:disable"],
+    "automerge": true,
+    "major": {
+      "automerge": false
+    },
+    "reviewers": ["matthew1809", "notrab"]
+  }

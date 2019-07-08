@@ -1,4 +1,4 @@
-module.exports.config = {
+const config = {
   queues: [
     {
       // Name of the bull queue, this name must match up exactly with what you've defined in bull.
@@ -41,3 +41,5 @@ module.exports.config = {
     },
   ],
 }
+
+export default config

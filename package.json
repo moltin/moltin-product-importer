@@ -7,6 +7,9 @@
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
   },
+  "scripts": {
+    "pretest": "./node_modules/.bin/eslint --ignore-path .gitignore . --fix"
+  },
   "bin": {
     "@moltin/import": "bin/import",
     "import": "bin/import"
@@ -28,18 +31,44 @@
     "bull-arena": "2.6.3",
     "bull-ui": "1.2.3",
     "chalk": "2.4.2",
+    "conventional-changelog-lint-config-cz": "^0.3.0",
     "dotenv": "8.0.0",
+    "envfile": "^3.0.0",
     "esm": "^3.2.25",
     "express": "4.17.1",
     "fast-csv": "3.0.1",
+    "figlet": "^1.2.3",
     "inquirer": "^6.4.1",
-    "path": "^0.12.7"
+    "lodash": "^4.17.11",
+    "lodash.merge": "^4.6.1",
+    "path": "^0.12.7",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
-    "@moltin/eslint-config": "1.0.0"
+    "@commitlint/cli": "^8.0.0",
+    "@commitlint/config-conventional": "^8.0.0",
+    "@moltin/eslint-config": "1.0.0",
+    "husky": "^3.0.0"
   },
   "files": [
     "bin/",
     "src/"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "npm run pretest"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "./node_modules/.bin/eslint — fix",
+      "git add"
+    ]
+  }
 }
