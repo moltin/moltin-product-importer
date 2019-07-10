@@ -2,11 +2,15 @@
 
 import chalk from 'chalk'
 import runProductsApps from './products/index'
+import runFilesApps from './files/index'
 
 export default async function chooseAndRunImport(entity) {
   switch (entity) {
     case 'products':
       runProductsApps()
+      break
+    case 'files':
+      runFilesApps()
       break
     default:
       console.log('entity not available for import')

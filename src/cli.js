@@ -161,7 +161,7 @@ async function promptForMissingEntity(options) {
       type: 'list',
       name: 'entity',
       message: 'Please choose which entity to import',
-      choices: ['products'],
+      choices: ['products', 'files'],
       default: defaultTemplate,
     })
   }
