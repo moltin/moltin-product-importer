@@ -1,5 +1,6 @@
 require('dotenv').config()
 const FormData = require('form-data')
+const fetch = require('node-fetch')
 
 const { MoltinClient } = require('@moltin/request')
 

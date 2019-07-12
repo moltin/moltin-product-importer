@@ -8,7 +8,7 @@ import {
 import {
   getFile,
   insertFile,
-  formatFileForInsert
+  formatFileForInsert,
 } from './utils/moltinUtils'
 
 import arenaConfig from './utils/arenaConfig'
@@ -33,13 +33,13 @@ export default function consumer() {
       const files = await getFile(fileData.name)
 
       if (files.length > 0) {
-       reject('File already exists')
+        reject(new Error('File already exists'))
       } else {
         await addFileToInsertQueue(insertJobQueue, fileData)
         resolve(`${fileData.name} was added to insert queue`)
       }
     } catch (e) {
-      reject(JSON.stringify(e))
+      reject(new Error(JSON.stringify(e)))
     }
   })
 

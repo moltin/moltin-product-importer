@@ -43,6 +43,7 @@
     "inquirer": "^6.4.1",
     "lodash": "^4.17.11",
     "lodash.merge": "^4.6.1",
+    "node-fetch": "^2.6.0",
     "path": "^0.12.7",
     "redis": "^2.8.0"
   },
