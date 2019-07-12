@@ -37,6 +37,7 @@
     "esm": "^3.2.25",
     "express": "4.17.1",
     "fast-csv": "3.0.1",
+    "fetch": "^1.1.0",
     "figlet": "^1.2.3",
     "form-data": "^2.5.0",
     "inquirer": "^6.4.1",

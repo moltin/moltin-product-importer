@@ -33,7 +33,7 @@ export async function getFilesFromCSV(fileLocation) {
         .on('end', () => {
           resolve(objects)
         })
-        fileMetaStream.pipe(csvStream)
+      fileMetaStream.pipe(csvStream)
     } catch (e) {
       reject(e)
     }

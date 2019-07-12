@@ -1,5 +1,5 @@
 require('dotenv').config()
-const FormData = require("form-data")
+const FormData = require('form-data')
 
 const { MoltinClient } = require('@moltin/request')
 
@@ -27,7 +27,7 @@ export async function formatFileForUpdate(id, file) {
 export async function findFileId(file) {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await client.get(`files?filter=eq(file_name,${file.file_name})`)
+      const result = await client.get(`files?filter=eq(file_name,${file.name})`)
       const { data } = result
 
       if (data.length === 1) {
@@ -61,9 +61,9 @@ export async function updateFile(file) {
 async function downloadFileFromURL(url) {
   return new Promise((resolve, reject) => {
     fetch(url)
-    .then(res => res.buffer())
-    .then(buffer => resolve(buffer))
-    .catch(e => reject(e))
+      .then(res => res.buffer())
+      .then(buffer => resolve(buffer))
+      .catch(e => reject(e))
   })
 }
 
@@ -78,23 +78,22 @@ export async function insertFile(file) {
     try {
       const fileName = file.name
       const buffer = await downloadFileFromURL(file.url)
-
       const formData = new FormData()
-      formData.append("file_name", fileName)
-      formData.append("public", "true")
-      formData.append("file", buffer, { fileName: fileName })
+      formData.append('file_name', fileName)
+      formData.append('public', 'true')
+      formData.append('file', buffer, { filename: fileName })
 
       const headers = {
-        "Content-Type": formData.getHeaders()["content-type"]
+        'Content-Type': formData.getHeaders()['content-type'],
       }
 
       const data = {
-        body: formData
+        body: formData,
       }
 
-      const result = await client.post("files", data, headers)
+      const result = await client.post('files', data, headers)
       resolve(result)
-    } catch(e) {
+    } catch (e) {
       reject(e)
     }
   })
