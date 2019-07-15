@@ -11,11 +11,11 @@ export default async function chooseAndRunImport(entity) {
       break
     case 'files':
       runFilesApps()
+      console.log('%s import is ready to run', chalk.green.bold(entity))
+      console.log(chalk.yellow.bold('make sure you have already run the products import'))
+      console.log('Please GET http://localhost:4000/insertOrUpdate, then get http://localhost:4000/associate')
       break
     default:
       console.log('entity not available for import')
   }
-
-  console.log('%s import is ready to run', chalk.green.bold(entity))
-  console.log('Please GET localhost:4000 to begin')
 }

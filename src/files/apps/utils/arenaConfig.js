@@ -28,7 +28,7 @@ const config = {
     },
     {
       // Name of the bull queue, this name must match up exactly with what you've defined in bull.
-      name: 'update-file-events',
+      name: 'associate-file-events',
 
       // Hostname or queue prefix, you can put whatever you want.
       hostId: 'MyAwesomeQueues',
@@ -41,7 +41,7 @@ const config = {
     },
     {
       // Name of the bull queue, this name must match up exactly with what you've defined in bull.
-      name: 'associate-file-events',
+      name: 'associate-main-image-events',
 
       // Hostname or queue prefix, you can put whatever you want.
       hostId: 'MyAwesomeQueues',

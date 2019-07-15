@@ -4,7 +4,9 @@ import {
   getFilesFromCSV,
   addFileDataToGetQueue,
   addFileDataToAssociateQueue,
+  addMainImageToAssociateQueue,
   formatFileMeta,
+  formatMainImageMeta,
 } from './utils/producerUtils'
 
 require('dotenv').config()
@@ -22,6 +24,7 @@ const createQueue = (name) => {
 
 const getJobQueue = createQueue('get-file-events')
 const associateJobQueue = createQueue('associate-file-events')
+const associateMainImagesJobQueue = createQueue('associate-main-image-events')
 
 export default function producer() {
   const app = express()
@@ -41,12 +44,26 @@ export default function producer() {
     }
   })
 
-  app.get('/associate', async (req, res) => {
+  app.get('/associateFiles', async (req, res) => {
     try {
       const fileMeta = await getFilesFromCSV(CSVLocation)
       const formattedFileMeta = await formatFileMeta(fileMeta)
       await addFileDataToAssociateQueue(associateJobQueue, formattedFileMeta)
       const count = await associateJobQueue.count()
+      console.log(`job count is ${count}`)
+
+      res.send('Done!\n')
+    } catch (e) {
+      res.send(JSON.stringify(e))
+    }
+  })
+
+  app.get('/associateMainImage', async (req, res) => {
+    try {
+      const fileMeta = await getFilesFromCSV(CSVLocation)
+      const formattedMainImageMeta = await formatMainImageMeta(fileMeta)
+      await addMainImageToAssociateQueue(associateMainImagesJobQueue, formattedMainImageMeta)
+      const count = await getJobQueue.count()
       console.log(`job count is ${count}`)
 
       res.send('Done!\n')

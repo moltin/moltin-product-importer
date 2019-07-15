@@ -60,10 +60,14 @@ export async function formatFileForInsert(file) {
   return newFile
 }
 
-export async function updateFile(file) {
+export async function associateMainImage(fileId, productId) {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await Moltin.Files.Update(file.id, file)
+      const result = await client.put(`products/${productId}/relationships/main-image`,
+        {
+          type: 'main_image',
+          id: fileId,
+        })
       resolve(result)
     } catch (e) {
       reject(e)
@@ -81,6 +85,7 @@ export async function associateFile(fileId, productId) {
         }])
       resolve(result)
     } catch (e) {
+      console.log(e)
       reject(e)
     }
   })
