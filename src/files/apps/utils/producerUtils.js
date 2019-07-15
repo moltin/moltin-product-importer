@@ -11,6 +11,13 @@ const addSingleFileDataToGetQueue = async (jobQueue, fileData) => {
     })
 }
 
+const addSingleFileDataToAssociateQueue = async (jobQueue, fileData) => {
+  jobQueue
+    .add('associate-file', {
+      title: `Associating file ${fileData.name}`,
+      fileData,
+    })
+}
 
 export async function getFilesFromCSV(fileLocation) {
   return new Promise((resolve, reject) => {
@@ -45,4 +52,36 @@ export async function addFileDataToGetQueue(jobQueue, fileMeta) {
     const singleFileMeta = fileMeta[i]
     addSingleFileDataToGetQueue(jobQueue, singleFileMeta)
   }
+}
+
+export async function addFileDataToAssociateQueue(jobQueue, fileMeta) {
+  for (let i = 0, len = fileMeta.length; i < len; i += 1) {
+    const singleFileMeta = fileMeta[i]
+    addSingleFileDataToAssociateQueue(jobQueue, singleFileMeta)
+  }
+}
+
+export async function formatFileMeta(fileMeta) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const newFileMeta = await fileMeta.map((row) => {
+        const allowed = ['url', 'sku']
+
+        const filtered = Object.keys(row)
+          .filter(key => allowed.includes(key))
+          .reduce((obj, key) => {
+            const newObj = obj
+            newObj[key] = row[key]
+            return newObj
+          }, {})
+
+        const filteredWithNewName = Object.assign({ name: `${filtered.sku}_main_image` }, filtered)
+        return (filteredWithNewName)
+      })
+      resolve(newFileMeta)
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
 }

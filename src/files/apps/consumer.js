@@ -9,6 +9,9 @@ import {
   getFile,
   insertFile,
   formatFileForInsert,
+  associateFile,
+  findFileId,
+  findProduct,
 } from './utils/moltinUtils'
 
 import arenaConfig from './utils/arenaConfig'
@@ -23,17 +26,17 @@ export default function consumer() {
   const redisUrl = `redis://${process.env.redisHost}:${process.env.redisPort}`
   const jobQueue = new Queue('get-file-events', redisUrl)
   const insertJobQueue = new Queue('insert-file-events', redisUrl)
+  const associateJobQueue = new Queue('associate-file-events', redisUrl)
 
   const getJobProcessor = job => new Promise(async (resolve, reject) => {
     try {
       const {
         data: { fileData },
       } = job
-
       const files = await getFile(fileData.name)
 
       if (files.length > 0) {
-        reject(new Error('File already exists'))
+        reject(new Error('file already exists'))
       } else {
         await addFileToInsertQueue(insertJobQueue, fileData)
         resolve(`${fileData.name} was added to insert queue`)
@@ -54,6 +57,25 @@ export default function consumer() {
     }
   })
 
+  const associateJobProcessor = job => new Promise(async (resolve, reject) => {
+    try {
+      const { fileData } = job.data
+      const fileId = await findFileId(fileData.name)
+      const matchingProductsArray = await findProduct(fileData.sku)
+
+      if (matchingProductsArray.length === 1) {
+        const productId = matchingProductsArray[0].id
+        await associateFile(fileId, productId)
+        resolve('file was associated with product')
+      } else {
+        resolve('file could not be associated with the product')
+      }
+    } catch (errorMessage) {
+      await handleFailedInsertJob(insertJobQueue, job, errorMessage)
+      reject(new Error(JSON.stringify(errorMessage)))
+    }
+  })
+
   const arena = Arena(arenaConfig)
 
   const app = express()
@@ -61,6 +83,7 @@ export default function consumer() {
 
   jobQueue.process('get-file', getJobProcessor)
   insertJobQueue.process('insert-file', insertJobProcessor)
+  associateJobQueue.process('associate-file', associateJobProcessor)
 
   app.use('/arena', arena)
   app.listen(port, () => console.log(`Consumer app running on port ${port}`))

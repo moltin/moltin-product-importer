@@ -3,6 +3,8 @@
 import {
   getFilesFromCSV,
   addFileDataToGetQueue,
+  addFileDataToAssociateQueue,
+  formatFileMeta,
 } from './utils/producerUtils'
 
 require('dotenv').config()
@@ -18,19 +20,33 @@ const createQueue = (name) => {
   return jobQueue
 }
 
-const jobQueue = createQueue('get-file-events')
+const getJobQueue = createQueue('get-file-events')
+const associateJobQueue = createQueue('associate-file-events')
 
 export default function producer() {
   const app = express()
   const port = 4000
 
-  app.get('/', async (req, res) => {
+  app.get('/insertOrUpdate', async (req, res) => {
     try {
-      // Parse the CSV rows
       const fileMeta = await getFilesFromCSV(CSVLocation)
+      const formattedFileMeta = await formatFileMeta(fileMeta)
+      await addFileDataToGetQueue(getJobQueue, formattedFileMeta)
+      const count = await getJobQueue.count()
+      console.log(`job count is ${count}`)
 
-      await addFileDataToGetQueue(jobQueue, fileMeta)
-      const count = await jobQueue.count()
+      res.send('Done!\n')
+    } catch (e) {
+      res.send(JSON.stringify(e))
+    }
+  })
+
+  app.get('/associate', async (req, res) => {
+    try {
+      const fileMeta = await getFilesFromCSV(CSVLocation)
+      const formattedFileMeta = await formatFileMeta(fileMeta)
+      await addFileDataToAssociateQueue(associateJobQueue, formattedFileMeta)
+      const count = await associateJobQueue.count()
       console.log(`job count is ${count}`)
 
       res.send('Done!\n')

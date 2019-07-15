@@ -25,16 +25,28 @@ export async function formatFileForUpdate(id, file) {
   return newFile
 }
 
-export async function findFileId(file) {
+export async function findFileId(name) {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await client.get(`files?filter=eq(file_name,${file.name})`)
+      const result = await client.get(`files?filter=eq(file_name,${name})`)
       const { data } = result
 
       if (data.length === 1) {
         resolve(data[0].id)
       }
       reject(new Error('no file found'))
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export async function findProduct(sku) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await client.get(`products?filter=eq(sku,${sku})`)
+      const { data } = result
+      resolve(data)
     } catch (e) {
       reject(e)
     }
@@ -52,6 +64,21 @@ export async function updateFile(file) {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Moltin.Files.Update(file.id, file)
+      resolve(result)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export async function associateFile(fileId, productId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await client.put(`products/${productId}/relationships/files`,
+        [{
+          type: 'file',
+          id: fileId,
+        }])
       resolve(result)
     } catch (e) {
       reject(e)

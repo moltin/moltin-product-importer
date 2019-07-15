@@ -39,6 +39,19 @@ const config = {
         password: '',
       },
     },
+    {
+      // Name of the bull queue, this name must match up exactly with what you've defined in bull.
+      name: 'associate-file-events',
+
+      // Hostname or queue prefix, you can put whatever you want.
+      hostId: 'MyAwesomeQueues',
+
+      redis: {
+        port: '6379',
+        host: '127.0.0.1',
+        password: '',
+      },
+    },
   ],
 }
 
