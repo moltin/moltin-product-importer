@@ -35,9 +35,6 @@ export default function producer() {
       const fileMeta = await getFilesFromCSV(CSVLocation)
       const formattedFileMeta = await formatFileMeta(fileMeta)
       await addFileDataToGetQueue(getJobQueue, formattedFileMeta)
-      const count = await getJobQueue.count()
-      console.log(`job count is ${count}`)
-
       res.send('Done!\n')
     } catch (e) {
       res.send(JSON.stringify(e))
@@ -49,9 +46,6 @@ export default function producer() {
       const fileMeta = await getFilesFromCSV(CSVLocation)
       const formattedFileMeta = await formatFileMeta(fileMeta)
       await addFileDataToAssociateQueue(associateJobQueue, formattedFileMeta)
-      const count = await associateJobQueue.count()
-      console.log(`job count is ${count}`)
-
       res.send('Done!\n')
     } catch (e) {
       res.send(JSON.stringify(e))
@@ -63,9 +57,6 @@ export default function producer() {
       const fileMeta = await getFilesFromCSV(CSVLocation)
       const formattedMainImageMeta = await formatMainImageMeta(fileMeta)
       await addMainImageToAssociateQueue(associateMainImagesJobQueue, formattedMainImageMeta)
-      const count = await getJobQueue.count()
-      console.log(`job count is ${count}`)
-
       res.send('Done!\n')
     } catch (e) {
       res.send(JSON.stringify(e))
