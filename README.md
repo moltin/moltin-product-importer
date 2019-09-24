@@ -12,6 +12,11 @@ importer
 ```
 
 ## ⛽️ Usage
+
+Before running, please make sure your CSV includes columns with the following names: slug, sku, name, description and price. You can leave in any additional columns and those will be created as flow fields.
+
+When running, the CLI will prompt you for the path to your CSV, as well as your moltin credentials and your redis port + host if not using the defaults.
+
 Once the import app has started, you can navigate to http://localhost:4567 in your web browser where you will see a neat web UI for observing the import. This UI runs using https://github.com/bee-queue/arena.
 
 To begin the import, simply GET localhost:4000
