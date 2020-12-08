@@ -36,7 +36,7 @@
     "envfile": "^3.0.0",
     "esm": "^3.2.25",
     "express": "4.17.1",
-    "fast-csv": "3.0.1",
+    "fast-csv": "4.3.6",
     "figlet": "^1.2.3",
     "inquirer": "^6.4.1",
     "lodash": "^4.17.11",
