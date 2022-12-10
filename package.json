@@ -35,7 +35,7 @@
     "dotenv": "8.0.0",
     "envfile": "^3.0.0",
     "esm": "^3.2.25",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "fast-csv": "3.0.1",
     "figlet": "^1.2.3",
     "inquirer": "^6.4.1",
